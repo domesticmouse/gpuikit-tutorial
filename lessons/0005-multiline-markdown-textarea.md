@@ -46,6 +46,7 @@ use gpui_kit::component::badge::Badge;
 use gpui_kit::component::button::{Button, ButtonVariants as _};
 use gpui_kit::component::input::{Input, InputEvent, InputState, Textarea, TextareaState};
 use gpui_kit::component::tag::Tag;
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::component::{h_flex, v_flex};
 use gpui_kit::*;
 ```
@@ -198,6 +199,7 @@ use gpui_kit::component::badge::Badge;
 use gpui_kit::component::button::{Button, ButtonVariants as _};
 use gpui_kit::component::input::{Input, InputEvent, InputState, Textarea, TextareaState};
 use gpui_kit::component::tag::Tag;
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::component::{h_flex, v_flex};
 use gpui_kit::*;
 
@@ -682,6 +684,7 @@ fn main() {
         .with_assets(gpui_kit::assets::Assets)
         .run(|cx| {
             gpui_kit::init(cx);
+            Theme::change(ThemeMode::Dark, None, cx);
             gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
                 cx.new(|cx| WorkbenchView::new_with_window(window, cx))
             })

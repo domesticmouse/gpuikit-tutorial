@@ -38,6 +38,7 @@ Table: Core Rust constructs mapped to GPUI Kit usage.
 ## 3. Minimal Window Bootstrap Template
 
 ```rust caption="Canonical GPUI Kit entry point with automatic Root wrapper"
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::*;
 
 fn main() {
@@ -45,6 +46,7 @@ fn main() {
         .with_assets(gpui_kit::assets::Assets)
         .run(|cx| {
             gpui_kit::init(cx);
+            Theme::change(ThemeMode::Dark, None, cx);
             gpui_kit::open_window(WindowOptions::default(), cx, |_, cx| {
                 cx.new(|_| WorkbenchView::new())
             })

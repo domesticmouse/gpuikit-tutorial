@@ -64,6 +64,7 @@ Rather than dumping an entire UI framework file on screen at once, let us build 
 ```rust caption="Block 1: Imports, TurnRole enum, and ConversationTurn struct"
 use gpui_kit::component::ActiveTheme as _;
 use gpui_kit::component::button::{Button, ButtonVariants as _};
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -231,6 +232,7 @@ fn main() {
         .with_assets(gpui_kit::assets::Assets)
         .run(|cx| {
             gpui_kit::init(cx);
+            Theme::change(ThemeMode::Dark, None, cx);
             gpui_kit::open_window(WindowOptions::default(), cx, |_, cx| {
                 cx.new(|_| WorkbenchView::new())
             })
@@ -242,6 +244,7 @@ fn main() {
 - **`gpui_kit::application().with_assets(gpui_kit::assets::Assets)`**: Constructs the platform application and attaches GPUI Kit's bundled icon assets.
 - **`.run(|cx| { ... })`**: Starts the native OS event loop and passes a mutable borrow `cx: &mut App` into your startup closure.
 - **`gpui_kit::init(cx)`**: Initializes themes, input keybindings, and component registries across `gpui-base` and `gpui-component`. Calling `open_window` before `init(cx)` would leave components un-themed!
+- **`Theme::change(ThemeMode::Dark, None, cx)`**: `gpui_kit::init(cx)` boots in light mode by default; calling `Theme::change(ThemeMode::Dark, None, cx)` switches the global palette, syntax highlighter, and base tokens to dark mode.
 - **`cx.new(|_| WorkbenchView::new())`**: Allocates `WorkbenchView` inside GPUI's entity arena and returns an **`Entity`** (`Entity<WorkbenchView>`), which `gpui_kit::open_window` automatically places inside a `Root` view.
 - **`.expect("failed to open workbench window")`**: `open_window` returns a `Result`. Calling `.expect(...)` unwraps the window handle on success or exits immediately with a clear error message if the OS fails to create a window.
 
@@ -296,6 +299,7 @@ Here is the entire `src/main.rs` file in context so you can inspect how all five
 ```rust caption="Complete src/main.rs for Lesson 0001"
 use gpui_kit::component::ActiveTheme as _;
 use gpui_kit::component::button::{Button, ButtonVariants as _};
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -433,6 +437,7 @@ fn main() {
         .with_assets(gpui_kit::assets::Assets)
         .run(|cx| {
             gpui_kit::init(cx);
+            Theme::change(ThemeMode::Dark, None, cx);
             gpui_kit::open_window(WindowOptions::default(), cx, |_, cx| {
                 cx.new(|_| WorkbenchView::new())
             })
@@ -486,6 +491,7 @@ Fill in the four missing tokens to initialize GPUI Kit, open a `Root`-wrapped wi
 fn main() {
     gpui_kit::application().run(|cx| {
         {{blank:gpui_kit::init(cx);|Initialize GPUI Kit layers first using init(cx);|gpui_kit::init(...);|20}}
+        Theme::change(ThemeMode::Dark, None, cx);
         {{blank:gpui_kit::open_window|Use the gpui_kit wrapper that installs Root automatically|gpui_kit::open_???|20}}(WindowOptions::default(), cx, |_, cx| {
             {{blank:cx.new|Allocate the view in GPUI's entity store via cx.new|cx.???|7}}(|_| WorkbenchView::new())
         })

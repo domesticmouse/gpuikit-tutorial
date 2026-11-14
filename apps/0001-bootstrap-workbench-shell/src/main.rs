@@ -1,5 +1,6 @@
 use gpui_kit::component::ActiveTheme as _;
 use gpui_kit::component::button::{Button, ButtonVariants as _};
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -137,6 +138,7 @@ fn main() {
         .with_assets(gpui_kit::assets::Assets)
         .run(|cx| {
             gpui_kit::init(cx);
+            Theme::change(ThemeMode::Dark, None, cx);
             gpui_kit::open_window(WindowOptions::default(), cx, |_, cx| {
                 cx.new(|_| WorkbenchView::new())
             })

@@ -18,6 +18,7 @@ Use these verified API patterns when building or teaching `gpui-kit` desktop app
 ```rust
 use gpui_kit::component::WindowExt as _;
 use gpui_kit::component::notification::Notification;
+use gpui_kit::component::theme::{Theme, ThemeMode};
 use gpui_kit::*;
 
 // Inside main():
@@ -25,6 +26,7 @@ gpui_kit::application()
     .with_assets(gpui_kit::assets::Assets)
     .run(|cx| {
         gpui_kit::init(cx);
+        Theme::change(ThemeMode::Dark, None, cx);
         register_workbench_keys(cx);
         gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
             cx.new(|cx| WorkbenchView::new_with_window(window, cx))
