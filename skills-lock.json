@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "skills": {
+    "agy-brain-explorer": {
+      "source": "domesticmouse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/agy-brain-explorer/SKILL.md",
+      "computedHash": "8cf74199c3b7b9c64bc1b0009e1d9aa8c1f7fdb36a0a505e95fa15e18ad0dbe8"
+    },
+    "asciinema": {
+      "source": "domesticmouse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/asciinema/SKILL.md",
+      "computedHash": "60e72e27c00dd3c4e2d8889589629736525a5ce7cb5eb084bcb9b39be29eb564"
+    },
+    "bjm-voice": {
+      "source": "domesticmouse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/bjm-voice/SKILL.md",
+      "computedHash": "3d92c0a0ece351b393f218ff347d40b97a8f01c704399071980119a020caedaa"
+    },
+    "cast-player-html": {
+      "source": "domesticmouse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cast-player-html/SKILL.md",
+      "computedHash": "eb5a41e0613287f1b75a70cd8a09e31ad2fce3fe46d589776e4a4b335ba308b4"
+    },
+    "crop-image": {
+      "source": "domesticmouse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/crop-image/SKILL.md",
+      "computedHash": "9a7751b6e32ebb4374156b01b0f5414c57551e3970ef5a39224f1ed112ab43b6"
+    },
+    "teach-code": {
+      "source": "domesticmouse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/teach-code/SKILL.md",
+      "computedHash": "6a26f7d02d88f46d1868e0c8af9442d92e1ba9e7df5b573908612cfae9a112bd"
+    }
+  }
+}
