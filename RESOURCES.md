@@ -12,6 +12,8 @@
   Target agentic SDK ecosystem that our Markdown and conversation workbench interfaces will support. Use for: aligning conversation turn models and transcript formats with real agent workflows.
 - [The Rust Programming Language ("The Book")](https://doc.rust-lang.org/book/)
   Official introductory text for ownership, borrowing, structs, enums, traits, and closures as they appear in GPUI code. Use for: deeper dives whenever a Rust language concept first shows up in a lesson.
+- [Workspace Skill: GPUI Kit (`0.9.1`) Reference Patterns](.agents/skills/gpui-kit/SKILL.md)
+  Verified workspace APIs and guardrails (`open_window`/`Root`, `WeakEntity` in `on_task_toggle`, `EditorState`, `h_resizable`/`size_range`, `actions!`, and test/Clippy workflows) extracted from Lessons 0001–0010.
 
 ## Wisdom (Communities)
 
