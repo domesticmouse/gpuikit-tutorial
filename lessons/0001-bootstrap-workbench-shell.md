@@ -34,9 +34,23 @@ flowchart TD
     Entity --> Render
 ```
 
-Notice what `gpui_kit::open_window` does for you automatically: it wraps your `WorkbenchView` inside a **`Root` View**{{sidenote:If you called raw GPUI's `cx.open_window` directly without `Root`, modal dialogs, menus, sheets, and toast notifications would have no top-level overlay host.}}. Step through all five startup stages below to see exactly which Rust ownership handle is active at each step.
+### Who Owns Your View? (`Entity<T>` and `cx`)
 
-{{widget:gpui-lifecycle-sim}}
+If you have written command-line Rust before, two things in GPUI code will immediately look unfamiliar: you never store `WorkbenchView` in a normal local variable, and almost every function takes a parameter named `cx`. Both exist for a single reason: **satisfying Rust's borrow checker in an event-driven GUI**.
+
+1. **Why GPUI owns your struct (`Entity<WorkbenchView>`)**: In a desktop app, the OS event loop, window resize events, and button click callbacks all need to read and mutate your UI at unpredictable times. Rust's borrow checker will not let ten callbacks hold `&mut WorkbenchView` at once. Instead of fighting Rust lifetimes, you hand `WorkbenchView` to GPUI's central arena via `cx.new(...)`. GPUI owns the struct and gives you back a lightweight, copyable ID card—`Entity<WorkbenchView>`. Whenever a frame renders or a callback fires, GPUI temporarily lends `&mut self` back to your struct for the duration of that call.
+2. **Why `cx` is everywhere (and why its type changes)**: Because GPUI owns your application state and entities, you talk to GPUI through a borrowed context handle conventionally named `cx`. As control flows from application startup down into your view, `cx` narrows from the whole application (`&mut App`) to your specific view (`&mut Context<WorkbenchView>`).
+3. **Why `gpui_kit::open_window` wraps your view in `Root`**: Calling `gpui_kit::open_window` instead of raw GPUI's `cx.open_window` automatically places your `WorkbenchView` inside a top-level **`Root` View**{{sidenote:If you called raw GPUI's `cx.open_window` directly without `Root`, modal dialogs, menus, sheets, and toast notifications would have no top-level overlay host.}} so dialogs, sheets, and toast notifications have somewhere to render.
+
+Table: How ownership and `cx` narrow across the five startup stages
+
+| Stage | Call | What `cx` Is Here | What Happens & Who Owns What |
+| :--- | :--- | :--- | :--- |
+| **1. Boot App** | `application().with_assets(...).run(\|cx\| ...)` | `cx: &mut App` | The OS event loop takes ownership of the app and lends your startup closure a mutable borrow of the whole `App`. |
+| **2. Init Kit** | `gpui_kit::init(cx)` | `cx: &mut App` | Registers `gpui-base` and `gpui-component` themes, keybindings, and global state inside `App` before any window opens. |
+| **3. Open Window** | `gpui_kit::open_window(..., cx, \|window, cx\| ...)` | `window: &mut Window`, `cx: &mut App` | Creates the native OS window and automatically installs `gpui_kit::component::Root` as the top-level overlay host. |
+| **4. Create Entity** | `cx.new(\|cx\| WorkbenchView::new())` | `cx: &mut Context<WorkbenchView>` | Allocates `WorkbenchView` inside GPUI's entity arena and returns a lightweight `Entity<WorkbenchView>` handle to `Root`. |
+| **5. Render Frame** | `Render::render(&mut self, window, cx)` | `&mut self`, `cx: &mut Context<Self>` | On every frame, GPUI temporarily lends you `&mut WorkbenchView` and its view `Context` to return a `div()` element tree. |
 
 ## Step 1: Configure the Crate Manifest (`Cargo.toml`)
 

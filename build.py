@@ -26,7 +26,7 @@ FENCE_RE = re.compile(
     re.MULTILINE | re.DOTALL,
 )
 ATTR_RE = re.compile(r'([a-zA-Z0-9_-]+)="([^"]*)"')
-HEADING_ANCHOR_RE = re.compile(r"<(h[1-6])([^>]*)>(.*?)\s*\{#([a-zA-Z0-9_-]+)\}</\1>", re.DOTALL)
+HEADING_ANCHOR_RE = re.compile(r"<(h[1-6])([^>]*)>((?:(?!</\1>).)*?)\s*\{#([a-zA-Z0-9_-]+)\}</\1>")
 BADGE_LESSON_PREFIX_RE = re.compile(r"^Lesson\s+\d+\s*[•·-]\s*", re.IGNORECASE)
 SIDENOTE_RE = re.compile(r"\{\{sidenote:(.*?)\}\}", re.DOTALL)
 WIDGET_RE = re.compile(r"\{\{widget:([a-zA-Z0-9_-]+)\}\}")
@@ -575,15 +575,15 @@ def render_page_body(
     text = WIDGET_RE.sub(_widget_repl, text)
 
     # 8. Convert Pipe Table Captions ("Table: ...") right before tables
+    md = make_md()
     text = re.sub(
         r"^Table:\s*(.+)$",
-        r'<div class="table-caption">\1</div>',
+        lambda m: f'<div class="table-caption">{md.renderInline(m.group(1).strip())}</div>',
         text,
         flags=re.MULTILINE,
     )
 
     # 9. Render Markdown
-    md = make_md()
     rendered_html = md.render(text)
 
     # 10. Add class="ref-table" to rendered tables and convert {#anchor-id} headings
