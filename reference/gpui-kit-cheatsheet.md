@@ -1,0 +1,62 @@
+---
+title: "GPUI Kit & Rust Quick Reference"
+page_title: "Cheat Sheet — GPUI Kit Course"
+nav_id: "cheatsheet"
+nav_label: "Cheat Sheet"
+badge: "Mission: Antigravity Markdown & Conversation Workbench"
+subtitle: "Layer map, Rust-for-UI mental model, window bootstrap recipe, and Cargo verification gates."
+card:
+  title: "**GPUI Kit & Rust Quick Reference**"
+  summary: "Printable reference for the 4-layer GPUI Kit stack, core Rust syntax, and Cargo verification commands."
+---
+
+## 1. The 4-Layer GPUI Kit Umbrella
+
+Adding `gpui-kit = "0.9.1"` in `Cargo.toml` pins and re-exports the whole stack under a single namespace:
+
+Table: GPUI Kit crate layers and when you import from each.
+
+| Layer / Module | Re-export Path | Responsibility |
+| :--- | :--- | :--- |
+| Core Runtime | `gpui_kit::*` | Windows, GPU rendering (`div()`, `Render`), `Entity<T>`, `App`, `application()` |
+| Unstyled Primitives | `gpui_kit::base` | Headless behavior, state engines, and keyboard/accessibility primitives |
+| Styled Components | `gpui_kit::component` | 75+ themed widgets (`Button`, `Input`, `Textarea`, `Editor`, `TextView`, `Root`) |
+| Assets Bundle | `gpui_kit::assets` | Default icon set (`gpui_kit::assets::Assets`) registered at startup |
+
+## 2. Rust Syntax You Meet First in GPUI Kit
+
+Table: Core Rust constructs mapped to GPUI Kit usage.
+
+| Syntax | Meaning | Example in Lesson 0001 |
+| :--- | :--- | :--- |
+| `#[derive(Debug, Clone)]` | Auto-generate trait implementations | Makes `TurnRole` printable and copyable |
+| `impl Type { ... }` | Attach methods to a struct or enum | `WorkbenchDoc::to_markdown(&self)` |
+| `&self` / `&mut self` | Shared read borrow vs. exclusive write borrow | `render(&mut self, ...)` |
+| `|cx| { ... }` | Closure (anonymous inline function) | Passed to `.run(|cx| ...)` and `.on_click(...)` |
+| `pub use` / `Trait as _` | Import a trait's methods without naming the trait | `use gpui_kit::component::ActiveTheme as _;` |
+
+## 3. Minimal Window Bootstrap Template
+
+```rust caption="Canonical GPUI Kit entry point with automatic Root wrapper"
+use gpui_kit::*;
+
+fn main() {
+    gpui_kit::application()
+        .with_assets(gpui_kit::assets::Assets)
+        .run(|cx| {
+            gpui_kit::init(cx);
+            gpui_kit::open_window(WindowOptions::default(), cx, |_, cx| {
+                cx.new(|_| WorkbenchView::new())
+            })
+            .expect("failed to open workbench window");
+        });
+}
+```
+
+## 4. Cargo Verification Commands
+
+```bash caption="Fast unit tests and strict zero-warning lint check"
+cargo test
+cargo clippy --all-targets -- -D warnings
+cargo run
+```

@@ -1,0 +1,8 @@
+.venv/
+_site/
+index.html
+lessons/*.html
+reference/*.html
+apps/*/target/
+__pycache__/
+.DS_Store
