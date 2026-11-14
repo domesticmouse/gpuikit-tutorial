@@ -60,3 +60,89 @@ cargo test
 cargo clippy --all-targets -- -D warnings
 cargo run
 ```
+
+
+## 5. Inputs, Markdown, Splits & Persistence (Lessons 0004–0010)
+
+### Controlled Input & Editor Sync
+```rust
+let input = cx.new(|cx| InputState::new(window, cx).placeholder("Session title..."));
+let sub = cx.subscribe_in(&input, window, |this, state, event, _window, cx| {
+    if matches!(event, InputEvent::Change) {
+        let value = state.read(cx).value().to_string();
+        this.doc.set_title(value);
+        cx.notify();
+    }
+});
+
+let editor = cx.new(|cx| {
+    EditorState::new(window, cx)
+        .language("markdown")
+        .line_number(true)
+        .soft_wrap(true)
+});
+```
+
+### Live Markdown Preview + Task Checkbox Callback
+```rust
+let view = cx.entity().downgrade();
+TextView::markdown("turn-markdown-preview", active_markdown)
+    .selectable(true)
+    .on_task_toggle(move |event: &TaskToggleEvent, window, cx| {
+        let range = event.marker_range();
+        let checked = event.checked();
+        let _ = view.update(cx, |this, cx| {
+            if this.toggle_active_task_marker(range, checked, window, cx) {
+                cx.notify();
+            }
+        });
+    })
+```
+
+### Split Panes & Segmented Mode Tabs
+```rust
+TabBar::new("layout-mode-tabs")
+    .segmented()
+    .selected_index(self.layout_mode.index())
+    .on_click(cx.listener(|this, ix: &usize, _window, cx| {
+        this.set_layout_mode(WorkspaceLayoutMode::from_index(*ix));
+        cx.notify();
+    }))
+    .child(Tab::new().label("Edit"))
+    .child(Tab::new().label("Split"))
+    .child(Tab::new().label("Preview"))
+
+h_resizable("workbench-main-split")
+    .child(
+        resizable_panel()
+            .size(px(320.))
+            .size_range(px(220.)..px(520.))
+            .child(turn_list_pane),
+    )
+    .child(resizable_panel().child(right_workspace))
+```
+
+### Actions, Keybindings & Notifications
+```rust
+gpui_kit::actions!(workbench, [SaveSession, ReloadSession, CopySessionMarkdown]);
+
+cx.bind_keys([
+    KeyBinding::new("cmd-s", SaveSession, Some("Workbench")),
+    KeyBinding::new("cmd-r", ReloadSession, Some("Workbench")),
+    KeyBinding::new("cmd-shift-c", CopySessionMarkdown, Some("Workbench")),
+]);
+
+// Inside Render::render on the root element:
+div()
+    .id("workbench-root")
+    .key_context("Workbench")
+    .track_focus(handle)
+    .on_action(cx.listener(|this, _: &SaveSession, window, cx| {
+        this.save_session_to_disk(window, cx);
+        cx.notify();
+    }))
+
+// Displaying status/error toasts via WindowExt:
+window.push_notification(Notification::info("Saved session"), cx);
+window.push_notification(Notification::error("Save failed"), cx);
+```

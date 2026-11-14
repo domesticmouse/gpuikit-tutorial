@@ -49,3 +49,21 @@ _Avoid_: "draw callback" or "imperative canvas loop".
 **Root View**:
 The top-level window container (`gpui_kit::component::Root`) automatically installed around your application view by `gpui_kit::open_window` so dialogs, sheets, menus, and notifications render above app panes.
 _Avoid_: "main div" or "HTML body".
+
+
+## 3. Concurrency, State, & Error Patterns (Lessons 0004–0010)
+
+- **`Entity<S>` & `Subscription`**: `Entity<S>` is a GPUI handle to a state object (`InputState`, `EditorState`) managed by the app context. Keep event listeners alive by storing their returned `Subscription` inside `Vec<Subscription>`.
+- **`WeakEntity<V>` (`cx.entity().downgrade()`)**: A non-owning weak handle safe to capture inside `Send + Sync + 'static` callbacks (like `TextView::on_task_toggle`) without creating reference cycles.
+- **`Result<T, E>`, `From`, & `?`**: Standard Rust error handling. Implementing `From<std::io::Error>` for a custom enum like `WorkbenchIoError` lets `?` automatically wrap OS filesystem failures into your domain error type.
+- **Traits & Extension Traits (`use Trait as _;`)**: Shared behavior interfaces. Importing `ActiveTheme as _`, `Selectable as _`, or `WindowExt as _` adds extension methods (such as `window.push_notification`) to existing types without exposing extra type names.
+- **Declarative Macros (`actions!`)**: Compile-time code generation (`gpui_kit::actions!(workbench, [...])`) that declares zero-sized typed unit structs implementing GPUI's `Action` trait.
+
+## 4. Interactive Workbench Components (Lessons 0004–0010)
+
+- **`Input` & `InputState`**: Single-line (`InputState::new(window, cx)`) and multiline (`multi_line(true)`) text controls synchronizing edits via `InputEvent::Change`.
+- **`Editor` & `EditorState`**: Code-aware editor widget supporting `.language("markdown")`, `.line_number(bool)`, and `.soft_wrap(bool)`.
+- **`TextView::markdown`**: Rich Markdown renderer supporting `.selectable(true)` and `.on_task_toggle(...)` interactive checkbox callbacks.
+- **`h_resizable` & `resizable_panel`**: Draggable split-pane containers configured via `.size(px(...))` and `.size_range(min..max)`.
+- **`TabBar` & `Tab`**: Segmented mode switcher (e.g., `Edit` / `Split` / `Preview`) driven by selected index.
+- **`Notification::info` / `Notification::error`**: Toast alerts pushed via `WindowExt::push_notification` into the outer `Root` overlay created automatically by `gpui_kit::open_window`.
